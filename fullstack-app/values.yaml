@@ -1,0 +1,55 @@
+namespace: fullstack-app
+
+# =====================
+# MySQL Configuration
+# =====================
+mysql:
+  image: mysql:8.0
+  rootPassword: password
+  database: projectdb
+  service:
+    port: 3306
+    type: ClusterIP   # Only accessible inside the cluster
+
+# =====================
+# Backend Configuration
+# =====================
+backend:
+  image: klu2300030623/dockerhelm-backend:latest
+  replicas: 2
+  port: 2000
+  nodePort: 30026
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 50
+
+# =====================
+# Frontend Configuration
+# =====================
+frontend:
+  image: klu2300030623/dockerhelm-frontend:latest
+  replicas: 2
+  port: 80
+  nodePort: 30081
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "256Mi"
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 50
+  apiUrl: "http://localhost:30026"  # Backend NodePort
